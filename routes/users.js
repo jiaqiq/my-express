@@ -1,5 +1,16 @@
 var express = require('express');
 var router = express.Router();
+//获取模块
+var bodyParser = require('body-parser')
+
+var app = express()
+
+// 创建 application/json 解析
+var jsonParser = bodyParser.json()
+
+// 创建 application/x-www-form-urlencoded 解析
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
+
 //导入mysql模块
 var mysql = require('mysql');
 var dbConfig = require('../db/DBConfig');
@@ -33,7 +44,8 @@ router.get('/addUser', function (req, res, next) {
         if (result) {
           result = {
             code: 200,
-            msg: '增加成功'
+            msg: '增加成功',
+            result: result
           };
         }
         // 以json形式，把操作结果返回给前台页面     
@@ -51,13 +63,14 @@ router.post('/delUser', (req, res, next) => {
     if (err) {
       console.log('建立连接失败')
     } else {
-      var param = req.query || req.params;
+      var param = req.body;
       var data = [param.id];
       connection.query(userSQL.delete, data, (err, result) => {
         if (result) {
           result = {
             code: 200,
-            msg: '删除成功'
+            msg: '删除成功',
+            result: result
           }
         };
         responseJSON(res, result);
@@ -73,13 +86,14 @@ router.post('/updateUser', (req, res, next) => {
     if (err) {
       console.log('建立连接失败')
     } else {
-      var param = req.query || req.params;
+      var param = req.body;
       var data = [param.name, param.age, param.teacher, param.id];
       connection.query(userSQL.update, data, (err, result) => {
         if (result) {
           result = {
             code: 200,
-            msg: '更新成功'
+            msg: '更新成功',
+            result: result
           }
         };
         responseJSON(res, result);
@@ -94,14 +108,14 @@ router.post('/selectUser', (req, res, next) => {
     if (err) {
       console.log('建立连接失败')
     } else {
-      var param = req.query || req.params;
+      var param = req.body;
       var data = [param.id, param.name, param.age, param.teacher];
       connection.query(userSQL.getUserById, data, (err, result) => {
         if (result) {
           result = {
             code: 200,
             msg: '查询成功',
-            res: result
+            result: result
           }
         };
         responseJSON(res, result);
