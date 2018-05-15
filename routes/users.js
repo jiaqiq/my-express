@@ -1,16 +1,16 @@
 var express = require('express');
 var router = express.Router();
-//获取模块
+var ws = require('../websocket/ws');
 var bodyParser = require('body-parser')
 
 var app = express()
 
 // 创建 application/json 解析
 var jsonParser = bodyParser.json()
-
 // 创建 application/x-www-form-urlencoded 解析
-var urlencodedParser = bodyParser.urlencoded({ extended: false });
-
+var urlencodedParser = bodyParser.urlencoded({
+  extended: false
+});
 //导入mysql模块
 var mysql = require('mysql');
 var dbConfig = require('../db/DBConfig');
@@ -28,7 +28,6 @@ var responseJSON = function (res, ret) {
     res.json(ret);
   }
 };
-
 /* GET users listing. */
 router.get('/addUser', function (req, res, next) {
   // 从连接池获取连接 
