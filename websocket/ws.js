@@ -14,7 +14,7 @@ wss.on('connection', function (ws) {
             var rad = Math.random();
             ws.send(`服务端推送${rad}`);
             if (timesRun === 60) {
-                clearInterval(interval);
+                // clearInterval(interval);
             }
             //do whatever here..
         }, 1000);

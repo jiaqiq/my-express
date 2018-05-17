@@ -1,11 +1,8 @@
 var express = require('express');
 var router = express.Router();
-var ws = require('../websocket/ws');
+// var ws = require('../websocket/ws');
 var bodyParser = require('body-parser')
-
-var app = express()
-
-// 创建 application/json 解析
+// 创建 application/json 解析/uploads
 var jsonParser = bodyParser.json()
 // 创建 application/x-www-form-urlencoded 解析
 var urlencodedParser = bodyParser.urlencoded({
@@ -102,7 +99,7 @@ router.post('/updateUser', (req, res, next) => {
   })
 })
 /**查询 */
-router.post('/selectUser', (req, res, next) => {
+router.post('/selectUserById', (req, res, next) => {
   pool.getConnection((err, connection) => {
     if (err) {
       console.log('建立连接失败')
@@ -110,6 +107,28 @@ router.post('/selectUser', (req, res, next) => {
       var param = req.body;
       var data = [param.id, param.name, param.age, param.teacher];
       connection.query(userSQL.getUserById, data, (err, result) => {
+        if (result) {
+          result = {
+            code: 200,
+            msg: '查询成功',
+            result: result
+          }
+        };
+        responseJSON(res, result);
+        connection.release();
+      })
+    }
+  })
+})
+//查询所有
+router.post('/selectUser', (req, res, next) => {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log('建立连接失败')
+    } else {
+      var param = req.body;
+      var data = [param.id, param.name, param.age, param.teacher];
+      connection.query(userSQL.queryAll, data, (err, result) => {
         if (result) {
           result = {
             code: 200,
