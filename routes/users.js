@@ -142,5 +142,33 @@ router.post('/selectUser', (req, res, next) => {
     }
   })
 })
+//登录
+router.post('/login', (req, res, next) => {
+  pool.getConnection((err, connection) => {
+    if(err) {
+      console.log('建立链接失败')
+    } else {
+      var param = req.body;
+      // var data = [param.id, param.login_type, param.login_token, param.username, param.password, param.nick_name];
+      var data = [param.username, param.password];
+      connection.query(userSQL.login, data, (err, result) => {
+        if(result.length) {
+          result = {
+            code: 200,
+            msg: '登录成功',
+            result: result
+          }
+        } else {
+          result = {
+            code: 0,
+            msg: '登录失败'
+          }
+        }
+        responseJSON(res, result);
+        connection.release();
+      })
+    }
+  })
+})
 
 module.exports = router;
