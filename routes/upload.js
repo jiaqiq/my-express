@@ -6,6 +6,17 @@ var router = express.Router()
 var upload = multer({
     dest: path.resolve(__dirname, '../public/uploads/')
 });
+// 响应一个JSON数据
+var responseJSON = function (res, ret) {
+    if (typeof ret === 'undefined') {
+      res.json({
+        code: '-200',
+        msg: '操作失败'
+      });
+    } else {
+      res.json(ret);
+    }
+  };
 
 //多文件上传 （限定上传文件个数）（没有修改后缀）
 router.post('/uploads', upload.array('file', 3), function (req, res, next) {
@@ -46,7 +57,6 @@ router.get('/files', function (req, res, next) {
     // 文件目录
     var filePath = path.join(__dirname, '../public/uploads/');
     fs.readdir(filePath, function (err, results) {
-        // console.log(123, results)
         if (err) throw err;
         if (results.length > 0) {
             var files = [];
@@ -64,17 +74,21 @@ router.get('/files', function (req, res, next) {
     });
 });
 
-router.get('/file/:fileName', function (req, res, next) {
-    // 实现文件下载 
-    var fileName = req.params.fileName;
-    var filePath = path.join(__dirname, fileName);
+router.get('/file', function (req, res, next) {
+    // 实现文件下载
+    var fileName = req.query.fileName;
+    var filePath = path.join(__dirname, '../public/uploads/' + fileName);
     var stats = fs.statSync(filePath);
     if (stats.isFile()) {
         res.set({
-            'Content-Type': 'application/octet-stream',
-            'Content-Disposition': 'attachment; filename=' + fileName,
+            'Content-Type': 'application/octet-stream; charset=utf-8',
+            'Content-Disposition': 'attachment; filename=' + encodeURI(fileName), // 含中文需转码
             'Content-Length': stats.size
         });
+        // res.writeHead(200, {
+        //     'Content-Type': 'application/octet-stream; charset=utf-8',
+        //     'Content-Disposition': 'attachment; filename=' + encodeURI(fileName), // 含中文需转码
+        //   });
         fs.createReadStream(filePath).pipe(res);
     } else {
         res.end(404);

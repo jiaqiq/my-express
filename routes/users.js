@@ -161,9 +161,32 @@ router.post('/login', (req, res, next) => {
         } else {
           result = {
             code: 0,
-            msg: '登录失败'
+            msg: '用户名或密码错误'
           }
         }
+        responseJSON(res, result);
+        connection.release();
+      })
+    }
+  })
+})
+
+//加载图片
+router.post('/loadImgs', (req, res, next) => {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log('建立连接失败')
+    } else {
+      var param = req.body;
+      var data = [param.id];
+      connection.query(userSQL.loadImgs, data, (err, result) => {
+        if (result) {
+          result = {
+            code: 200,
+            msg: '查询成功',
+            result: result
+          }
+        };
         responseJSON(res, result);
         connection.release();
       })
