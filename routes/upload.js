@@ -74,15 +74,16 @@ router.get('/files', function (req, res, next) {
     });
 });
 
-router.get('/file', function (req, res, next) {
+router.get('/file/:fileName', function (req, res, next) {
     // 实现文件下载
-    var fileName = req.query.fileName;
+    var fileName = req.params.fileName;
     var filePath = path.join(__dirname, '../public/uploads/' + fileName);
     var stats = fs.statSync(filePath);
     if (stats.isFile()) {
         res.set({
             'Content-Type': 'application/octet-stream; charset=utf-8',
             'Content-Disposition': 'attachment; filename=' + encodeURI(fileName), // 含中文需转码
+            // 'Content-Disposition': 'attachment; filename=' + encodeURIComponent(fileName), // 含中文需转码
             'Content-Length': stats.size
         });
         // res.writeHead(200, {

@@ -1,0 +1,8 @@
+extends layout
+
+block content
+
+  ul
+  each val in files
+     li
+       a(href='file/#{val}')= val
