@@ -65,18 +65,49 @@ router.get('/files', function (req, res, next) {
                     files.push(file);
                 }
             })
-            res.render('files', {
-                files: files
-            });
+            result = {
+              code: 200,
+              msg: '查看文件',
+              result: files
+            }
+            // 以json形式，把操作结果返回给前台页面
+            responseJSON(res, result);
+            //服务端渲染
+            // res.render('files', {
+            //     files: files
+            // });
         } else {
             res.end('当前目录下没有文件');
         }
     });
 });
-
+// /file/:fileName 服务端路由参数格式
 router.get('/file/:fileName', function (req, res, next) {
     // 实现文件下载
     var fileName = req.params.fileName;
+    var filePath = path.join(__dirname, '../public/uploads/' + fileName);
+    var stats = fs.statSync(filePath);
+    if (stats.isFile()) {
+        res.set({
+            'Content-Type': 'application/octet-stream; charset=utf-8',
+            // 'Content-Disposition': 'attachment; filename=' + encodeURI(fileName), // 含中文需转码
+            'Content-Disposition': 'attachment; filename=' + encodeURIComponent(fileName), // 含中文需转码
+            'Content-Length': stats.size
+        });
+        // res.writeHead(200, {
+        //     'Content-Type': 'application/octet-stream; charset=utf-8',
+        //     'Content-Disposition': 'attachment; filename=' + encodeURI(fileName), // 含中文需转码
+        //   });
+        fs.createReadStream(filePath).pipe(res);
+    } else {
+        res.end(404);
+    }
+});
+
+// /file 前端下载
+router.get('/file', function (req, res, next) {
+    // 实现文件下载
+    var fileName = req.query.fileName;
     var filePath = path.join(__dirname, '../public/uploads/' + fileName);
     var stats = fs.statSync(filePath);
     if (stats.isFile()) {
